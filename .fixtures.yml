@@ -1,3 +1,14 @@
+---
 fixtures:
+  forge_modules:
+    stdlib:
+      repo: "puppetlabs/stdlib"
+      ref: ">= 8.0.0 < 10.0.0"
+    augeas_core:
+      repo: "puppetlabs/augeas_core"
+      ref: ">= 1.0.0 < 3.0.0"
+    sshkeys_core:
+      repo: "puppetlabs/sshkeys_core"
+      ref: ">= 1.0.0 < 3.0.0"
   symlinks:
     accounts: "#{source_dir}"

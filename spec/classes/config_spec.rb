@@ -6,8 +6,12 @@ describe 'accounts::config', :type => :class do
   describe 'on Debian' do
     let(:facts) do
       {
-      :osfamily => 'Debian',
-    }
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { major: '12', full: '12.0' },
+        },
+      }
     end
 
     let(:params) do
@@ -29,8 +33,12 @@ describe 'accounts::config', :type => :class do
   describe 'on RedHat' do
     let(:facts) do
       {
-      :osfamily => 'RedHat',
-    }
+        os: {
+          family: 'RedHat',
+          name: 'RedHat',
+          release: { major: '9', full: '9.0' },
+        },
+      }
     end
 
     let(:params) do

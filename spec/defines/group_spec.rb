@@ -5,8 +5,11 @@ require 'spec_helper'
 describe 'accounts::group', :type => :define do
   let(:facts) do
     {
-      :osfamily => 'Debian',
-      :puppetversion => Puppet.version,
+      os: {
+        family: 'Debian',
+        name: 'Debian',
+        release: { major: '12', full: '12.0' },
+      },
     }
   end
 

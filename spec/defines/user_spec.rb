@@ -5,8 +5,11 @@ require 'spec_helper'
 describe 'accounts::user', :type => :define do
   let(:facts) do
     {
-      :osfamily => 'Debian',
-      :puppetversion => Puppet.version,
+      os: {
+        family: 'Debian',
+        name: 'Debian',
+        release: { major: '12', full: '12.0' },
+      },
     }
   end
 
@@ -619,10 +622,13 @@ describe 'accounts::user', :type => :define do
       end
       let(:facts) do
         {
-          :salts => {},
-          :fqdn  => 'testhost',
-          :osfamily => 'Debian',
-          :puppetversion => Puppet.version,
+          salts: {},
+          fqdn: 'testhost',
+          os: {
+            family: 'Debian',
+            name: 'Debian',
+            release: { major: '12', full: '12.0' },
+          },
         }
       end
       it {
@@ -636,9 +642,12 @@ describe 'accounts::user', :type => :define do
       let(:params) { { :password => 'test1234' } }
       let(:facts) do
         {
-          :salts => { 'foo' => '7kjgdqd0uK3y8zJv' },
-          :osfamily => 'Debian',
-          :puppetversion => Puppet.version,
+          salts: { 'foo' => '7kjgdqd0uK3y8zJv' },
+          os: {
+            family: 'Debian',
+            name: 'Debian',
+            release: { major: '12', full: '12.0' },
+          },
         }
       end
       it {

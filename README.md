@@ -1,61 +1,75 @@
 # Puppet Accounts Management
 
-[![Puppet
-Forge](http://img.shields.io/puppetforge/v/deric/accounts.svg)](https://forge.puppetlabs.com/deric/accounts) [![Build Status](https://travis-ci.org/deric/puppet-accounts.png?branch=master)](https://travis-ci.org/deric/puppet-accounts) [![Puppet Forge
-Downloads](http://img.shields.io/puppetforge/dt/deric/accounts.svg)](https://forge.puppetlabs.com/deric/accounts/scores)
+A Puppet module for managing user accounts, groups, and SSH authorized keys with
+full Hiera support.
 
-This is puppet module for managing user accounts, groups and setting ssh keys.
+> **Fork notice:** This module is a maintained fork of
+> [deric/puppet-accounts](https://github.com/deric/puppet-accounts), updated for
+> Puppet 7.x / Puppet 8.x / OpenVox 8.x compatibility with modern PDK tooling.
+> See the [Attribution](#attribution) section for the full list of previous
+> maintainers and contributors.
 
-Version compatibility:
+## Compatibility
 
-| `deric-accounts`  | Puppet 3.x    | Puppet 4.x   | Puppet 5.x | Puppet 6.x |
-| ----------------- | ------------- |--------------| -----------|------------|
-| `1.5.x`           | :heavy_check_mark: | :heavy_check_mark: | :question: | :x:  |
-| `2.0.x`           | :question:  | :heavy_check_mark: |  :heavy_check_mark: | :x:  |
-| `2.1.x`           | :question: | :question: | :heavy_check_mark: | :heavy_check_mark: |
+| Module version | Puppet 4.x | Puppet 5/6.x | Puppet 7.x | Puppet 8.x / OpenVox 8.x |
+| -------------- | :--------: | :----------: | :--------: | :-----------------------: |
+| `1.5.x`        | ✓          | ?            | ✗          | ✗                         |
+| `2.0.x`        | ✓          | ✓            | ✗          | ✗                         |
+| `2.1.x`        | ?          | ✓            | ✓ (partial)| ✗                         |
+| `3.0.x` (this) | ✗          | ✗            | ✓          | ✓                         |
 
-  * `deric-acounts >= 2.0` - Puppet 4.x, Puppet 5.x
-  * `deric-acounts < 2.0` - Puppet 3.x, Puppet 4.x
+**Requires:** Puppet >= 7.0.0, puppetlabs-stdlib >= 8.0.0
+
+### Supported operating systems
+
+| OS                        | Versions    |
+| ------------------------- | ----------- |
+| Red Hat Enterprise Linux  | 7, 8, 9, 10 |
+| CentOS                    | 7, 8, 9, 10 |
+| Rocky Linux               | 8, 9, 10    |
+| AlmaLinux                 | 8, 9, 10    |
+| Debian                    | 10, 11, 12, 13 |
+| Ubuntu                    | 20.04, 22.04, 24.04 |
 
 Origin: https://github.com/deric/puppet-accounts
 
-Basic usage:
+## Basic usage
 
 ```puppet
-class {'::accounts':}
+class { 'accounts': }
 ```
 
-or with pure YAML declaration make sure to use the `hiera_include` function e.g. in `site.pp` (see [Hiera docs for details](https://docs.puppet.com/hiera/3.2/complete_example.html#using-hierainclude)):
+Or with pure Hiera — include the class in `site.pp`:
+
 ```puppet
-lookup('classes', {merge => unique}).include
+lookup('classes', { merge => unique }).include
 ```
-and all other definition can be in YAML hierarchy:
+
+Then configure everything in your Hiera hierarchy:
+
 ```yaml
 classes:
-  - '::accounts'
+  - 'accounts'
+
 accounts::users:
   myuser:
     groups: ['users']
 ```
 
-Hiera allows flexible account management, if you want to have a group defined on all nodes, just put in global hiera config, e.g. `common.yml`:
+## User accounts
+
+Hiera example with common defaults and per-user configuration:
 
 ```yaml
 accounts::user_defaults:
   shell: '/bin/bash'
-  # will delete all authorized keys that are not in Puppet
   purge_ssh_keys: true
+
 accounts::groups:
   www-data:
     gid: 33
-    # not necessarily complete list of memebers, you can assign users to the same group on
-    # user's level using `groups: ['www-data']`
     members: ['john']
-```
 
-and user accounts:
-
-```yaml
 accounts::users:
   john:
     comment: "John Doe"
@@ -63,20 +77,21 @@ accounts::users:
     shell: "/bin/bash"
     pwhash: "$6$GDH43O5m$FaJsdjUta1wXcITgKekNGUIfrqxYogW"
     ssh_keys:
-      'john@doe': # an unique indentifier of a key
+      'john@doe':
         type: "ssh-rsa"
-        key: "a valid public ssh key string"
+        key: "AAAA..."
   alice:
     comment: "Alice"
 ```
 
-For more examples see [configuration used for tests](https://github.com/deric/puppet-accounts/blob/master/spec/fixtures/hiera/default.yaml).
+For more examples see the [test fixtures](spec/fixtures/hiera/default.yaml).
 
 ### Custom home
 
-When no `home` is specified directory will be created in `/home/{username}`.
+When no `home` is specified, the directory defaults to `/home/{username}`.
 
 ```yaml
+accounts::users:
   alice:
     comment: 'Alice'
     home: '/var/alice'
@@ -84,48 +99,45 @@ When no `home` is specified directory will be created in `/home/{username}`.
 
 ### Group management
 
-By default each user has a group with the same name. You can change this with `manage_group` parameter:
+By default each user has a primary group with the same name.  Disable with
+`manage_group`:
 
 ```yaml
 accounts::users:
- john:
-   manage_group: false
-   groups:
-     - 'users'
-     - 'www-data'
+  john:
+    manage_group: false
+    groups:
+      - 'users'
+      - 'www-data'
 ```
-Optionally you can assign user to other groups by supplying a `groups` array.
 
 ### Primary group
 
-Account's primary group can be configured using `primary_group` parameter:
 ```yaml
 accounts::users:
- john:
-   # will create primary group `doe` instead of default `john` group
-   primary_group: 'doe'
-   manage_group: true
-   groups:
-     - 'sudo'
+  john:
+    primary_group: 'doe'
+    manage_group: true
+    groups:
+      - 'sudo'
 ```
-it can be defined numerically or as a group name. Setting [directly `gid`](https://docs.puppet.com/puppet/latest/reference/types/user.html#user-attribute-gid) parametr would have the same effect. Parameter `manage_group` is not considered when you set `gid`.
+
+The value may be a group name or a numeric GID.  Setting `gid` directly has the
+same effect; `manage_group` is ignored when `gid` is set.
 
 ### Account removal
 
-Removing account could be done by setting `ensure` parameter to `absent`:
-
 ```yaml
 accounts::users:
- john:
-   ensure: 'absent'
-   managehome: true
+  john:
+    ensure: 'absent'
+    managehome: true
 ```
 
-If `managehome` is set to `true` (default), also home directory will be removed!
+Setting `managehome: true` also removes the home directory.
 
 ### Root account
 
-`root` home is set to `/root` unless defined otherwise (using `home` parameter). You can supply multiple keys for one account.
 ```yaml
 accounts::users:
   root:
@@ -140,9 +152,9 @@ accounts::users:
 
 ### Additional SSH key options
 
-SSH allows providing many options regarding authorized keys, see [SSH documentation](http://man.openbsd.org/OpenBSD-current/man8/sshd.8#AUTHORIZED_KEYS_FILE_FORMAT) for complete specification.
+See the [sshd authorized_keys documentation](http://man.openbsd.org/sshd.8#AUTHORIZED_KEYS_FILE_FORMAT)
+for a full list of options.
 
-Options should be passed as an array:
 ```yaml
 accounts::users:
   foo:
@@ -152,86 +164,64 @@ accounts::users:
         key: 'AAAA....'
         options:
           - 'permitopen="10.4.3.29:3306"'
-          - 'permitopen="10.4.3.30:5432"'
           - 'no-port-forwarding'
           - 'no-X11-forwarding'
-          - 'no-agent-forwarding'
-          - 'from="serverA,serverB"'
           - 'command="/path/to/script.sh arg1 $SSH_ORIGINAL_COMMAND"'
 ```
 
-### Password Management
+### Password management
 
-You can either provide an already hashed password or you can let the module take
-care of hashing.
+Provide a pre-hashed password:
 
-Providing hashed passwords from Hiera is secure by default. Please use something
-like hiera-eyaml or hiera-gpg for cleartext passwords within Puppet.
-
-Example with pre-hashed password:
 ```yaml
 accounts::users:
   john:
     pwhash: "$6$GDH43O5m$FaJsdjUta1wXcITgKekNGUIfrqxYogW"
 ```
-Example with cleartext password, using hiera-eyaml:
+
+Or a cleartext password via hiera-eyaml (never commit plaintext):
+
 ```yaml
 accounts::users:
   john:
     password: >
-      ENC[PKCS7,MIIBeQYJKoZIhvcNAQcDoIIBajCCAWYCAQAxggEhMIIBHQIBADAFMAACAQAw
-      ...
-      1yv7gBCuc3T2xV9gPYe+DrALDYB+]
-   ensure: present
+      ENC[PKCS7,MIIBe...]
+    ensure: present
 ```
-The password hashing salt is generated with `fqdn_rand_string` from stdlib the first
-time the user is created. After that, the salt is read by a custom fact and reused,
-even on password changes (which is ok, it's just a salt...). You may specify an
-explicit salt if needed (see variable doc below).
 
-## User
+The hashing salt is generated with `fqdn_rand_string` on first run and then
+persisted via the custom `salts` Facter fact, so password changes reuse the
+same salt.
 
-* `authorized_keys_file` - allows providing location of custom `authorized_keys`
-* `purge_ssh_keys` - delete all keys except those explicitly provided (default: `false`)
-* `ssh_key_source` - provide file with authorized keys
-* `pwhash` - set password hash
-* `password` - (optional) set cleartext password (mutually exclusive with `pwhash`!)
-* `salt` - (optional, default random/fact based) salt for hashing the `password`, this may only be up to 16 characters
-* `hash` - (optional, default 'SHA-512') password hash function to use (valid strings: see [puppetlabs/stdlib#pw_hash](https://github.com/puppetlabs/puppetlabs-stdlib#pw_hash))
-* `force_removal` - will kill user's process before removing account with `ensure => absent` (default: `true`)
-* `hushlogin` - creates a `.hushlogin` file in users home directory that disables the motd
-* `ssh_dir_owner` (default: `user`) owner of `.ssh` directory (and `authorized_keys` file in the directory). Should not be changed unless you're moving out of user's home (see #64 for more details).
-* ssh_dir_group` (default: `user`) owner of `.ssh` directory (and `authorized_keys` file in the directory).
-* `manage_ssh_dir` Whether `.ssh` directory should be managed by this module (default: `true`)
+## User parameter reference
 
-Example:
-
-```yaml
-accounts::users:
- john:
-   authorized_keys_file: '/home/.ssh/auth_file'
-   managehome: true
-   purge_ssh_keys: false
-   pwhash: ''
-   hushlogin: true
-```
+| Parameter               | Default                   | Description |
+| ----------------------- | ------------------------- | ----------- |
+| `authorized_keys_file`  | `~/.ssh/authorized_keys`  | Custom authorized_keys path |
+| `purge_ssh_keys`        | `false`                   | Remove keys not listed in Puppet |
+| `ssh_key_source`        | —                         | File source for authorized_keys |
+| `pwhash`                | `''`                      | Pre-hashed password |
+| `password`              | —                         | Cleartext password (mutually exclusive with `pwhash`) |
+| `salt`                  | random / fact-based       | Salt for hashing (max 16 chars: `[A-Za-z0-9./]`) |
+| `hash`                  | `'SHA-512'`               | Hash function for `password` (see stdlib `pw_hash`) |
+| `force_removal`         | `true`                    | Kill user processes before account removal |
+| `hushlogin`             | `false`                   | Create `.hushlogin` to suppress MOTD |
+| `ssh_dir_owner`         | username                  | Owner of `.ssh/` directory |
+| `ssh_dir_group`         | username                  | Group of `.ssh/` directory |
+| `manage_ssh_dir`        | `true`                    | Whether to manage `.ssh/` directory |
 
 ### `umask`
 
-Default permissions for creating new files are managed via `~/.bash_profile` and `~/.bashrc`.
+Per-user umask via `~/.bash_profile` and `~/.bashrc`:
 
 ```yaml
 accounts::users:
- john:
-   manageumask: true
-   umask: '022'
+  john:
+    manageumask: true
+    umask: '022'
 ```
 
-By default `umask` is not managed. Note that you can configure global `umask` for all users via `accounts::config` (see below).
-
 ## Global settings
-
-You can provide global defaults for all users:
 
 ```yaml
 accounts::user_defaults:
@@ -239,210 +229,142 @@ accounts::user_defaults:
   groups: ['users']
   hushlogin: true
 ```
- * `groups` common group(s) for all users
-
-Note that configuration from Hiera gets merged to with Puppet code.
 
 ### System-wide configuration
 
-Global settings affects also user accounts created outside of this module.
+Affects all user accounts, including those managed outside this module.
 
 ```yaml
 accounts::config:
   first_uid: 1000
-  last_uid: 99999
+  last_uid:  99999
   first_gid: 1000
-  last_gid: 99999
+  last_gid:  99999
   umask: '077'
 ```
- * `first_uid` - Sets the lowest UID for non system users
- * `last_uid` - Sets the highest UID for non system users
- * `first_gid` - Sets the lowest GID for non system groups
- * `last_gid` - Sets the highest GID for non system groups
- * `umask` - Default global `umask` (can be overriden in user's `~/.profile`)
-
 
 ### Populate home folder
 
-Allows fetching user's directory content from some storage:
-
 ```yaml
 accounts::users:
- john:
-   populate_home: true
-   home_directory_contents: 'puppet:///modules/accounts'
-```
-which default to `puppet:///modules/accounts/{username}`.
-
-## Testing
-
-Which accounts will be installed on specific machine can be checked from command line:
-
-```bash
-$ hiera -y my_node.yml accounts::users --hash
+  john:
+    populate_home: true
+    home_directory_contents: 'puppet:///modules/accounts'
 ```
 
-where `my_node.yml` is a file which you get from facter running at some node:
-
-```bash
-$ facter -y > my_node.yml
-```
-
-### Without Hiera
-
-Using Hiera is optional (though prefered option), you can configure accounts directly from Puppet code:
-
-
-```puppet
-class {'accounts':
-  users => { 'john' => { 'comment' => 'John Doe' }}
-}
-```
-
-When defining adding a user to multiple groups, we have to ensure, that all the groups exists first:
-
-```puppet
-  class {'accounts':
-    groups => {
-      'users' => {
-        'gid' => 100,
-      },
-      'puppet' => {
-        'gid' => 111,
-      }
-    },
-    users => { 'john' => {
-      'shell'   => '/bin/bash',
-      'groups'  => ['users', 'puppet'],
-      'ssh_keys' => { 'johns_key' => {'type' => 'ssh-rsa', 'key' => 'public_ssh_key_xxx' }}
-    }}
-  }
-```
-
-## Puppet compatibility
-
-This modules heavily relies on Hiera functionality, thus it's recommended to use at least Puppet 3. Puppet 2.7 might work with `hiera-puppet` gem, but we don't test this automatically, see [docs](https://docs.puppetlabs.com/hiera/1/installing.html#step-2-install-the-puppet-functions) for more details.
-
-  * `3.x` work out-of-the-box
-  * `4.x` other backends than Hiera might work
+Defaults to `puppet:///modules/accounts/{username}`.
 
 ## Hiera configuration
 
-Puppet 4.9 comes with Hiera 5 support. For earlier versions see Hiera 3 section.
-
-### Hiera 5
-
-When migrating from Hiera 3 see the [official guide](https://puppet.com/docs/puppet/5.0/hiera_migrate_v3_yaml.html):
-
-`hiera.yaml` has slightly different syntax:
+Puppet 4.9+ (Hiera 5) example `hiera.yaml`:
 
 ```yaml
 ---
 version: 5
-defaults:  # Used for any hierarchy level that omits these keys.
-  datadir: hieradata         # This path is relative to hiera.yaml's directory.
-  data_hash: yaml_data  # Use the built-in YAML backend.
-
+defaults:
+  datadir: hieradata
+  data_hash: yaml_data
 hierarchy:
   - name: "Common"
     path: "common.yaml"
-
 ```
-Supported [merge strategies](https://puppet.com/docs/puppet/5.0/hiera_merging.html) are:
 
-* `first` A first-found lookup doesn’t merge anything; it returns the first value found, and ignores the rest (default).
-* `unique` A unique merge (sometimes called “array merge”) combines any number of array and scalar (string/number/boolean) values to return a merged, flattened array with all duplicate values removed.
-* `hash` A hash merge combines the keys and values of any number of hashes to return a merged hash.
-* `deep` Like a hash merge, a deep merge combines the keys and values of any number of hashes to return a merged hash. But if the same key exists in multiple source hashes, Hiera recursively merges them.
+Use `lookup_options` for deep merging:
 
-
-Using `lookup_options` you can define rules to use strategy that suits your needs.
 ```yaml
----
 lookup_options:
   "^accounts::(.*)":
     merge:
       strategy: deep
-      # sort_merged_arrays: false
-      # merge_hash_arrays: false
 ```
 
-### Hiera 3
+## Without Hiera
 
-For more complex hierarchies (defined in multiple files) `deep_merge` gem is needed, see [Hiera docs](https://docs.puppetlabs.com/hiera/3.0/lookup_types.html#deep-merging-in-hiera).
-
-```
-gem install deep_merge
-```
-
-and update `merge_behavior` in your `hiera.yaml`, e.g.:
-```yaml
----
-:backends:
-  - yaml
-:hierarchy:
-  - "%{hostname}"
-  - common
-# options are native, deep, deeper
-:merge_behavior: deeper
+```puppet
+class { 'accounts':
+  users => { 'john' => { 'comment' => 'John Doe' } },
+}
 ```
 
-With [Puppet librarian](https://github.com/rodjek/librarian-puppet) add one line to `Puppetfile`:
+With multiple groups:
 
-stable release:
-
-```ruby
-mod 'deric-accounts'
+```puppet
+class { 'accounts':
+  groups => {
+    'users'  => { 'gid' => 100 },
+    'puppet' => { 'gid' => 111 },
+  },
+  users => {
+    'john' => {
+      'shell'    => '/bin/bash',
+      'groups'   => ['users', 'puppet'],
+      'ssh_keys' => {
+        'johns_key' => { 'type' => 'ssh-rsa', 'key' => 'public_ssh_key_xxx' },
+      },
+    },
+  },
+}
 ```
 
-development version (master branch from github):
-```ruby
-mod 'deric-accounts', :git => 'https://github.com/deric/puppet-accounts.git'
-```
+## Testing
 
-and run
+Install dependencies and run unit tests:
 
 ```bash
-$ librarian-puppet install
+bundle install
+bundle exec rake spec
 ```
 
-## Supported versions
-
-## Tests
-
-Run tests with:
+Run lint and syntax checks:
 
 ```bash
-$ bundle install
-$ bundle exec rake spec
+bundle exec rake lint
+bundle exec rake syntax
 ```
 
-## Acceptance testing
+Run all checks at once (default task):
 
-Fastest way is to run tests on prepared Docker images:
-```
-BEAKER_set=debian9-5.5 bundle exec rake acceptance
-BEAKER_set=centos7-3.8 bundle exec rake acceptance
-```
-For examining system state set Beaker's ENV variable `BEAKER_destroy=no`:
-
-```
-BEAKER_destroy=no BEAKER_set=debian9-6.3 bundle exec rake acceptance
-```
-and after finishing tests connect to container:
-```
-docker exec -it adoring_shirley bash
+```bash
+bundle exec rake
 ```
 
-When host machine is NOT provisioned (puppet installed, etc.):
-```
-PUPPET_install=yes BEAKER_set=debian-8 bundle exec rake acceptance
+### Acceptance / system tests
+
+Acceptance tests use [Puppet Litmus](https://github.com/puppetlabs/puppet_litmus):
+
+```bash
+bundle exec rake 'litmus:provision[docker, debian:12]'
+bundle exec rake litmus:install_agent
+bundle exec rake litmus:install_module
+bundle exec rake litmus:acceptance:parallel
 ```
 
-Run on specific OS (see `spec/acceptance/nodesets`), to see available sets:
-```
-rake beaker:sets
-```
+## Attribution
+
+This module is a fork of [deric/puppet-accounts](https://github.com/deric/puppet-accounts),
+originally created and long maintained by **Tomas Barton** and a wide community
+of contributors.
+
+We are grateful to all previous maintainers and contributors who made this
+module what it is today:
+
+Craig Dunn,
+Henning Henkel,
+Jeremy T. Bouse,
+John Bartko,
+Michael Clay,
+Michael Gaber,
+Oliver Bertuch,
+Onur Cem Celebi,
+Salimane Adjao Moustapha,
+Sebastian Gumprich,
+Simon Beirnaert,
+Simon Peeters,
+Sonia Hamilton,
+Stefan Zipkid Goethals,
+Steve ESSO,
+**Tomas Barton** (original author),
+and everyone who filed issues, opened pull requests, or sent feedback.
 
 ## License
 

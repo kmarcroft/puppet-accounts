@@ -5,8 +5,11 @@ require 'spec_helper'
 describe 'accounts::authorized_keys', :type => :define do
   let(:facts) do
     {
-      :osfamily => 'Debian',
-      :puppetversion => '3.5.1',
+      os: {
+        family: 'Debian',
+        name: 'Debian',
+        release: { major: '12', full: '12.0' },
+      },
     }
   end
   let(:user) { 'joe' }

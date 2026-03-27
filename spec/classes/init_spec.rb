@@ -5,8 +5,11 @@ require 'spec_helper'
 describe 'accounts', :type => :class do
   let(:facts) do
     {
-      :osfamily => 'Debian',
-      :puppetversion => Puppet.version,
+      os: {
+        family: 'Debian',
+        name: 'Debian',
+        release: { major: '12', full: '12.0' },
+      },
     }
   end
   let(:params) do
@@ -549,9 +552,12 @@ describe 'accounts', :type => :class do
   context 'users accounts' do
     let(:facts) do
       {
-      :osfamily      => 'Debian',
-      :puppetversion => Puppet.version,
-    }
+        os: {
+          family: 'Debian',
+          name: 'Debian',
+          release: { major: '12', full: '12.0' },
+        },
+      }
     end
 
     describe 'invalid parameters' do

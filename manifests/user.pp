@@ -1,100 +1,137 @@
-# Always include main class definition:
+# @summary Manage a Linux/Unix user account with optional SSH keys and password.
 #
-#  class{ '::accounts': }
+# @param username
+#   The user account name. Defaults to the resource title.
+# @param ensure
+#   Whether the user should be present or absent.
+# @param uid
+#   Optional numeric or string UID to force.
+# @param gid
+#   Optional GID to force for the user's login group.
+# @param primary_group
+#   Name or ID of the user's primary group. Defaults to the username.
+# @param comment
+#   GECOS/description field, typically the user's full name.
+# @param groups
+#   Additional groups the user should belong to.
+# @param ssh_key_source
+#   Path to a file to use as the authorized_keys source (overrides ssh_keys).
+# @param ssh_keys
+#   Hash of SSH public keys to add to the user's authorized_keys file.
+# @param purge_ssh_keys
+#   When true, remove any SSH keys not explicitly listed in ssh_keys.
+# @param shell
+#   Login shell for the user.
+# @param pwhash
+#   Pre-hashed password string. Mutually exclusive with $password.
+# @param password
+#   Cleartext password; hashed using $hash and $salt. Mutually exclusive with $pwhash.
+# @param salt
+#   Optional explicit salt for hashing $password (max 16 chars: A-Za-z0-9./).
+#   When unset the salt is read from the salts fact or generated on first run.
+# @param hash
+#   Hash algorithm for $password. See stdlib pw_hash() for valid values.
+# @param managehome
+#   Whether to manage the user's home directory.
+# @param hushlogin
+#   When true, create a .hushlogin file in the home directory to suppress MOTD.
+# @param manage_group
+#   When true, create a primary group matching the account name (or $primary_group).
+# @param manageumask
+#   When true, set the user's umask via ~/.bash_profile and ~/.bashrc.
+# @param umask
+#   Umask value to write when $manageumask is true.
+# @param home
+#   Absolute path to the user's home directory. Defaults to /home/$username.
+# @param recurse_permissions
+#   Whether to recursively manage permissions on the home directory.
+# @param authorized_keys_file
+#   Absolute path to a custom authorized_keys file.
+# @param force_removal
+#   When true, kill the user's running processes before removing the account.
+# @param destroy_home_on_remove
+#   When true and ensure => absent, remove the home directory with rm -rf.
+# @param populate_home
+#   When true, populate the home directory from $home_directory_contents.
+# @param home_directory_contents
+#   Puppet file source URI used when $populate_home is true.
+# @param password_max_age
+#   Maximum number of days before the password must be changed.
+# @param allowdupe
+#   Whether to allow duplicate UIDs.
+# @param home_permissions
+#   File mode for the home directory.
+# @param manage_ssh_dir
+#   Whether to manage the .ssh directory inside the home directory.
+# @param ssh_dir_owner
+#   Owner of the .ssh directory and authorized_keys file.
+# @param ssh_dir_group
+#   Group of the .ssh directory and authorized_keys file.
 #
-# or with pure YAML declaration, site.pp:
-#
-#  lookup('classes', {merge => unique}).include
-#
-# hiera configuration e.g. default.yaml:
-#   classes:
-#     - '::accounts'
-#   accounts::users:
-#     myuser:
-#       groups: ['users']
-#
-# Linux user account
-#
-#  Parameters:
-#
-#  * [allowdupe] - Whether to allow duplicate UIDs. Defaults to false.
-#  * [comment] - A description of the user. Generally the user's full name.
-#  * [destroy_home_on_remove] rm -rf on `$home` directory will be executed upon removal (default: `false`)
-#  * [uid] - Force User ID (in Linux)
-#  * [gid] - Force Group ID
-#  * [manage_group] - Whether primary group with the same name as
-#                    the account name should be created
-#  * [primary_group] - name of user's primary group, if empty account name
-#                    will be used.
-#  * [pwhash] - password hash for the user
-#  * [password] - (optional) cleartext password, will be hashed (mutually exclusive with `pwhash`!)
-#  * [salt] - (optional, default random/fact based) salt for hashing the `password`
-#  * [hash] - (optional, default 'SHA-512') password hash function to use (see puppetlabs/stdlib#pw_hash)
-#  * [ssh_dir_owner] (default: `user`) owner of `.ssh` directory (and `authorized_keys` file in the directory).
-#                     Should not be changed unless you're moving out of user's home.
-#  * [ssh_dir_group] (default: `user`) owner of `.ssh` directory (and `authorized_keys` file in the directory).
-#  * [manage_ssh_dir] Whether `.ssh` directory should be managed by this module (default: `true`)
-#
-define accounts::user(
-  # intentionally, workaround for: https://tickets.puppetlabs.com/browse/PUP-4332
-  # lint:ignore:only_variable_string  # see https://github.com/deric/puppet-accounts/pull/11 for more details
-  String                             $username = "${title}",
+define accounts::user (
+  # lint:ignore:only_variable_string
+  # Workaround for https://tickets.puppetlabs.com/browse/PUP-4332
+  # See https://github.com/deric/puppet-accounts/pull/11 for details
+  String                             $username               = "${title}",
   # lint:endignore
-  Enum['present', 'absent']          $ensure = 'present',
-  Optional[Variant[String, Integer]] $uid = undef,
-  Optional[Variant[String, Integer]] $gid = undef,
-  Optional[Variant[String, Integer]] $primary_group = undef,
-  Optional[String]                   $comment = undef,
-  Array                              $groups = [],
-  Optional[Stdlib::Absolutepath]     $ssh_key_source = undef,
-  Hash                               $ssh_keys = {},
-  Boolean                            $purge_ssh_keys = false,
-  String                             $shell ='/bin/bash',
-  String                             $pwhash = '',
-  Optional[String]                   $password = undef,
-  Optional[String]                   $salt = undef,
-  String                             $hash = 'SHA-512',
-  Boolean                            $managehome = true,
-  Boolean                            $hushlogin = false,
-  Boolean                            $manage_group = true, # create a group with '$primary_group' name
-  Boolean                            $manageumask = false,
-  String                             $umask = '0022',
-  Optional[Stdlib::Absolutepath]     $home = undef,
-  Boolean                            $recurse_permissions = false,
-  Optional[Stdlib::Absolutepath]     $authorized_keys_file = undef,
-  Boolean                            $force_removal = true,
+  Enum['present', 'absent']          $ensure                 = 'present',
+  Optional[Variant[String, Integer]] $uid                    = undef,
+  Optional[Variant[String, Integer]] $gid                    = undef,
+  Optional[Variant[String, Integer]] $primary_group          = undef,
+  Optional[String]                   $comment                = undef,
+  Array                              $groups                 = [],
+  Optional[Stdlib::Absolutepath]     $ssh_key_source         = undef,
+  Hash                               $ssh_keys               = {},
+  Boolean                            $purge_ssh_keys         = false,
+  String                             $shell                  = '/bin/bash',
+  Optional[String]                  $pwhash                 = undef,
+  Optional[String]                   $password               = undef,
+  Optional[String]                   $salt                   = undef,
+  String                             $hash                   = 'SHA-512',
+  Boolean                            $managehome             = true,
+  Boolean                            $hushlogin              = false,
+  Boolean                            $manage_group           = true,
+  Boolean                            $manageumask            = false,
+  String                             $umask                  = '0022',
+  Optional[Stdlib::Absolutepath]     $home                   = undef,
+  Boolean                            $recurse_permissions    = false,
+  Optional[Stdlib::Absolutepath]     $authorized_keys_file   = undef,
+  Boolean                            $force_removal          = true,
   Boolean                            $destroy_home_on_remove = false,
-  Boolean                            $populate_home = false,
+  Boolean                            $populate_home          = false,
   String                             $home_directory_contents = 'puppet:///modules/accounts',
-  Optional[Integer]                  $password_max_age = undef,
-  Boolean                            $allowdupe = false,
-  String                             $home_permissions = '0700',
-  Boolean                            $manage_ssh_dir = true,
-  Optional[Variant[String, Integer]] $ssh_dir_owner = undef,
-  Optional[Variant[String, Integer]] $ssh_dir_group = undef,
+  Optional[Integer]                  $password_max_age       = undef,
+  Boolean                            $allowdupe              = false,
+  String                             $home_permissions       = '0700',
+  Boolean                            $manage_ssh_dir         = true,
+  Optional[Variant[String, Integer]] $ssh_dir_owner          = undef,
+  Optional[Variant[String, Integer]] $ssh_dir_group          = undef,
 ) {
-
-  if $pwhash != '' and $password {
+  if $pwhash and $password {
     fail("You cannot set both \$pwhash and \$password for ${username}.")
   }
   if $password {
-    # explicit salt given. just ensure it's a string.
+    # explicit salt given — validate format then use it.
     if $salt {
-      validate_re($salt, '^[A-Za-z0-9\./]{,16}$')
+      unless $salt =~ /^[A-Za-z0-9\.\/]{0,16}$/ {
+        fail("Salt for ${username} must be up to 16 characters from [A-Za-z0-9./].")
+      }
       $_salt = $salt
-    # if no explicit salt is given, try to get it from fact or generate
-    # (generation thus only on first run, when user is not present)
+      # if no explicit salt is given, try to get it from fact or generate
+      # (generation thus only on first run, when user is not present)
     } else {
-      if ! $::salts[$title] {
-        #$set = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890./'
+      if $facts['salts'] =~ Hash {
+        $_salts = $facts['salts']
+      } else {
+        $_salts = {}
+      }
+      if ! $_salts[$title] {
         $_salt = fqdn_rand_string(16, undef, "User[${title}]")
       } else {
-        $_salt = $::salts[$title]
+        $_salt = $_salts[$title]
       }
     }
-    if $hash {
-      validate_string($hash)
-    } else {
+    if !$hash {
       fail('You need to specify a hash function for hashing cleartext passwords.')
     }
   }
@@ -140,28 +177,25 @@ define accounts::user(
     'absent': {
       if $managehome == true and $destroy_home_on_remove == true {
         exec { "rm -rf ${home_dir}":
-          path   => [ '/bin', '/usr/bin' ],
+          path   => ['/bin', '/usr/bin'],
           onlyif => "test -d ${home_dir}",
         }
       }
 
-      anchor { "accounts::user::remove_${name}": }
-
       # when user is logged in we couldn't remove the account, issue #23
+      user { $username:
+        ensure => absent,
+        uid    => $uid,
+      }
+
       if $force_removal {
         exec { "killproc ${name}":
           command     => "pkill -TERM -u ${name}; sleep 1; skill -KILL -u ${name}",
           path        => ['/bin', '/sbin', '/usr/bin', '/usr/sbin'],
           onlyif      => "id ${name}",
           refreshonly => true,
-          before      => Anchor["accounts::user::remove_${name}"],
+          before      => User[$username],
         }
-      }
-
-      user { $username:
-        ensure  => absent,
-        uid     => $uid,
-        require => Anchor["accounts::user::remove_${name}"],
       }
 
       if $manage_group == true {
@@ -187,7 +221,7 @@ define accounts::user(
       }
 
       # Set password if available
-      if $pwhash != '' {
+      if $pwhash {
         User<| title == $username |> { password => $pwhash }
       }
       # Work on cleartext password if available
@@ -259,7 +293,6 @@ define accounts::user(
           require              => File[$home_dir],
         }
       }
-
     }
     # other ensure value is not possible (exception would be thrown earlier)
     default: {}

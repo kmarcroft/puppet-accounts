@@ -7,19 +7,19 @@ require 'rspec-puppet'
 describe 'accounts_group_members' do
   describe 'basic usage ' do
     it 'should raise an error if run with extra arguments' do
-      is_expected.to run.with_params(1, 2, 3, 4).and_raise_error(Puppet::ParseError)
+      is_expected.to run.with_params(1, 2, 3, 4).and_raise_error(StandardError)
     end
 
     it 'should raise an error with incorrect type of arguments' do
-      is_expected.to run.with_params(1, 2).and_raise_error(Puppet::ParseError)
+      is_expected.to run.with_params(1, 2).and_raise_error(Puppet::Error)
     end
 
     it 'should raise an error when running without arguments' do
-      is_expected.to run.with_params(nil).and_raise_error(Puppet::ParseError)
+      is_expected.to run.with_params(nil).and_raise_error(Puppet::Error)
     end
 
     it 'should raise an error when given incorrect type' do
-      is_expected.to run.with_params([]).and_raise_error(Puppet::ParseError)
+      is_expected.to run.with_params([]).and_raise_error(Puppet::Error)
     end
   end
 

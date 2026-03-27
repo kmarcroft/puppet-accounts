@@ -1,44 +1,31 @@
 {
-  "name": "deric-accounts",
-  "version": "2.1.0-unreleased",
-  "author": "Tomas Barton",
-  "summary": "Module for managing user accounts and groups and SSH keys.",
+  "name": "krimax-accounts",
+  "version": "3.0.0",
+  "author": "KriMax",
+  "summary": "Module for managing user accounts, groups, and SSH keys.",
   "license": "Apache-2.0",
-  "source": "https://github.com/deric/puppet-accounts",
-  "project_page": "https://github.com/deric/puppet-accounts",
-  "issues_url": "https://github.com/deric/puppet-accounts/issues",
-  "description": "User and groups management with hiera support.",
+  "source": "https://github.com/KriMax/puppet-accounts",
+  "project_page": "https://github.com/KriMax/puppet-accounts",
+  "issues_url": "https://github.com/KriMax/puppet-accounts/issues",
+  "description": "User and groups management with Hiera support. Forked from deric/puppet-accounts.",
   "dependencies": [
     {
       "name": "puppetlabs-stdlib",
-      "version_requirement": ">= 4.6.0 < 7.0.0"
+      "version_requirement": ">= 8.0.0 < 10.0.0"
     },
-    { "name": "puppetlabs-augeas_core",
-      "version_requirement": "> 1.0.0"
+    {
+      "name": "puppetlabs-augeas_core",
+      "version_requirement": ">= 1.0.0 < 3.0.0"
     },
-    { "name": "puppetlabs-sshkeys_core",
-      "version_requirement": "> 1.0.0"
+    {
+      "name": "puppetlabs-sshkeys_core",
+      "version_requirement": ">= 1.0.0 < 3.0.0"
     }
   ],
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
-        "6",
-        "7"
-      ]
-    },
-    {
-      "operatingsystem": "CentOS",
-      "operatingsystemrelease": [
-        "6",
-        "7"
-      ]
-    },
-    {
-      "operatingsystem": "Debian",
-      "operatingsystemrelease": [
-        "6",
         "7",
         "8",
         "9",
@@ -46,20 +33,52 @@
       ]
     },
     {
+      "operatingsystem": "CentOS",
+      "operatingsystemrelease": [
+        "7",
+        "8",
+        "9",
+        "10"
+      ]
+    },
+    {
+      "operatingsystem": "Rocky",
+      "operatingsystemrelease": [
+        "8",
+        "9",
+        "10"
+      ]
+    },
+    {
+      "operatingsystem": "AlmaLinux",
+      "operatingsystemrelease": [
+        "8",
+        "9",
+        "10"
+      ]
+    },
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "10",
+        "11",
+        "12",
+        "13"
+      ]
+    },
+    {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
-        "10.04",
-        "12.04",
-        "14.04",
-        "16.04",
-        "18.04"
+        "20.04",
+        "22.04",
+        "24.04"
       ]
     }
   ],
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 4.10.0 < 7.0.0"
+      "version_requirement": ">= 7.0.0 < 9.0.0"
     }
   ]
 }

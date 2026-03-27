@@ -1,45 +1,33 @@
-source "https://rubygems.org"
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gem 'puppet', ENV['PUPPET_VERSION'] || ['>= 7.0', '< 9.0']
 
 group :test do
-  gem "puppet", ENV['PUPPET_VERSION'] || ['> 4.10.0','< 7.0']
-  gem "rspec"
-  gem 'rspec-mocks'
-  gem 'rspec-puppet'
-  gem "puppetlabs_spec_helper"
-  gem 'rspec-puppet-facts'
-  gem 'simplecov', '>= 0.11.0'
+  gem 'rake'
+  gem 'rspec', '~> 3.0'
+  gem 'rspec-puppet', '>= 4.0'
+  gem 'puppetlabs_spec_helper', '>= 6.0'
+  gem 'rspec-puppet-facts', '>= 2.0'
+  gem 'simplecov', '>= 0.21.0'
   gem 'simplecov-console'
   gem 'deep_merge'
-  gem 'hiera'
-  gem 'librarian-puppet' , '>=2.0'
-  gem 'metadata-json-lint'
-  gem 'rubocop'
-  gem 'rake'
-  gem "puppet-lint-absolute_classname-check"
-  gem "puppet-lint-leading_zero-check"
-  gem "puppet-lint-trailing_comma-check"
-  gem "puppet-lint-version_comparison-check"
-  gem "puppet-lint-classes_and_types_beginning_with_digits-check"
-  gem "puppet-lint-unquoted_string-check"
-  gem 'puppet-lint-resource_reference_syntax'
+  gem 'metadata-json-lint', '>= 3.0'
+  gem 'rubocop', '>= 1.50'
+  gem 'rubocop-performance'
+  gem 'puppet-lint', '>= 3.0'
+  gem 'puppet-syntax', '>= 3.2'
+  gem 'voxpupuli-test', '>= 7.0'
 end
 
 group :development do
-  gem "travis"
-  gem "travis-lint"
-  gem 'puppet-blacksmith', git: 'https://github.com/deric/puppet-blacksmith', branch: 'tag-order'
-  gem "guard-rake"
-  gem 'pdk', '> 1.0'
+  gem 'pdk', '>= 3.0'
+  gem 'puppet-blacksmith', '>= 6.0'
+  gem 'github_changelog_generator', '>= 1.16'
 end
 
 group :system_tests do
-  gem 'pry'
-  gem 'beaker'
-  gem 'beaker-rspec'
-  gem 'beaker-docker'
-  gem 'serverspec'
-  gem 'beaker-hostgenerator'
-  gem 'beaker-puppet_install_helper'
-  gem 'beaker-module_install_helper'
-  gem 'master_manipulator'
+  gem 'puppet_litmus', '>= 1.0'
+  gem 'serverspec', '>= 2.0'
 end

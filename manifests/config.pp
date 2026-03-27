@@ -1,11 +1,13 @@
-# Global accounts configuration
-class accounts::config(
+# @summary Apply system-wide accounts configuration settings.
+#
+# @param options
+#   Hash of configuration options (e.g. umask, uid_min, uid_max, gid_min, gid_max).
+class accounts::config (
   Hash $options = {}
 ) {
-
   if has_key($options, 'umask') {
     $umask = $options['umask']
-    augeas {'Set umask':
+    augeas { 'Set umask':
       incl    => '/etc/login.defs',
       lens    => 'Login_Defs.lns',
       changes => [
@@ -15,7 +17,7 @@ class accounts::config(
   }
 
   if has_key($options, 'first_uid') {
-    case $::osfamily {
+    case $facts['os']['family'] {
       'Debian': {
         shellvar { 'FIRST_UID':
           ensure => present,
@@ -24,7 +26,7 @@ class accounts::config(
         }
       }
       'RedHat': {
-        augeas {'Set first uid':
+        augeas { 'Set first uid':
           incl    => '/etc/login.defs',
           lens    => 'Login_Defs.lns',
           changes => [
@@ -33,13 +35,13 @@ class accounts::config(
         }
       }
       default: {
-        fail("I don't know how to set first UID on osfamily ${::osfamily}")
+        fail("I don't know how to set first UID on os family ${facts['os']['family']}")
       }
     }
   }
 
   if has_key($options, 'last_uid') {
-    case $::osfamily {
+    case $facts['os']['family'] {
       'Debian': {
         shellvar { 'LAST_UID':
           ensure => present,
@@ -48,7 +50,7 @@ class accounts::config(
         }
       }
       'RedHat': {
-        augeas {'Set last uid':
+        augeas { 'Set last uid':
           incl    => '/etc/login.defs',
           lens    => 'Login_Defs.lns',
           changes => [
@@ -57,13 +59,13 @@ class accounts::config(
         }
       }
       default: {
-        fail("I don't know how to set last UID on osfamily ${::osfamily}")
+        fail("I don't know how to set last UID on os family ${facts['os']['family']}")
       }
     }
   }
 
   if has_key($options, 'first_gid') {
-    case $::osfamily {
+    case $facts['os']['family'] {
       'Debian': {
         shellvar { 'FIRST_GID':
           ensure => present,
@@ -72,7 +74,7 @@ class accounts::config(
         }
       }
       'RedHat': {
-        augeas {'Set first gid':
+        augeas { 'Set first gid':
           incl    => '/etc/login.defs',
           lens    => 'Login_Defs.lns',
           changes => [
@@ -81,13 +83,13 @@ class accounts::config(
         }
       }
       default: {
-        fail("I don't know how to set first GID on osfamily ${::osfamily}")
+        fail("I don't know how to set first GID on os family ${facts['os']['family']}")
       }
     }
   }
 
   if has_key($options, 'last_gid') {
-    case $::osfamily {
+    case $facts['os']['family'] {
       'Debian': {
         shellvar { 'LAST_GID':
           ensure => present,
@@ -96,7 +98,7 @@ class accounts::config(
         }
       }
       'RedHat': {
-        augeas {'Set last gid':
+        augeas { 'Set last gid':
           incl    => '/etc/login.defs',
           lens    => 'Login_Defs.lns',
           changes => [
@@ -105,9 +107,8 @@ class accounts::config(
         }
       }
       default: {
-        fail("I don't know how to set last GID on osfamily ${::osfamily}")
+        fail("I don't know how to set last GID on os family ${facts['os']['family']}")
       }
     }
   }
-
 }

@@ -1,0 +1,3 @@
+---
+# Debian-family systems use world-readable home directories by default
+accounts::home_permissions: '0755'

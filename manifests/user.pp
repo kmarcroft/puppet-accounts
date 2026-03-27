@@ -277,7 +277,7 @@ define accounts::user (
           }
         } else {
           file { "${home_dir}/.hushlogin":
-            ensure  => absent,
+            ensure => absent,
           }
         }
 

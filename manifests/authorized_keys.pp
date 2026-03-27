@@ -1,25 +1,26 @@
-# Manage authorized ssh keys
+# @summary Manage authorized SSH keys for a user account.
 #
-#  * [ssh_keys] - Hash containing public ssh keys:
-#      {
-#        'key1' => {
-#          'type' => 'ssh-rsa',
-#          'key' => 'AAAA',
-#        },
-#        'key2' => {
-#          'type' => 'ssh-rsa',
-#          'key' => 'BBBB',
-#        }
-#      }
-#  * [home_dir] user's home directory
-#  * [purge_ssh_keys] keys that are not explicitly stated in
-#    `ssh_keys` will be removed
-#  * [manage_ssh_dir] whether `.ssh` directory should be managed by this module (default: `true`)
-#  * [ssh_key_source] path to file with `authorized_keys` content (overrides `ssh_keys`)
-#  * [ssh_dir_owner] .ssh dir owner and authorized_keys file as well
-#  * [ssh_dir_group] .ssh dir group and authorized_keys file as well
-#
-define accounts::authorized_keys(
+# @param home_dir
+#   The user's home directory path.
+# @param ssh_keys
+#   Hash of SSH public keys to authorise. Each key entry should include 'type' and 'key'.
+# @param gid
+#   The primary group ID (used for file ownership when ssh_dir is templated).
+# @param ssh_dir_owner
+#   Owner of the .ssh directory and authorized_keys file. Defaults to the resource title.
+# @param ssh_dir_group
+#   Group of the .ssh directory and authorized_keys file. Defaults to the resource title.
+# @param ssh_key_source
+#   Optional path to a file providing the full authorized_keys content (overrides ssh_keys).
+# @param username
+#   The user account name. Defaults to the resource title.
+# @param authorized_keys_file
+#   Optional absolute path to the authorized_keys file. Defaults to ~/.ssh/authorized_keys.
+# @param ensure
+#   Whether the authorized_keys file should be present or absent.
+# @param manage_ssh_dir
+#   Whether this define should manage the .ssh directory resource.
+define accounts::authorized_keys (
   Stdlib::Absolutepath $home_dir,
   Hash $ssh_keys = {},
   Variant[String, Integer] $gid = $title,
@@ -30,8 +31,7 @@ define accounts::authorized_keys(
   Optional[String] $authorized_keys_file = undef,
   Enum['present', 'absent'] $ensure = 'present',
   Boolean $manage_ssh_dir = true,
-  ){
-
+) {
   if $authorized_keys_file {
     $ssh_dir = accounts_parent_dir($authorized_keys_file)
     $auth_key_file = $authorized_keys_file
@@ -40,18 +40,19 @@ define accounts::authorized_keys(
     $auth_key_file = "${ssh_dir}/authorized_keys"
   }
 
-  anchor { "accounts::ssh_dir_created_${title}": }
-  anchor { "accounts::auth_keys_created_${title}": }
-
   if $manage_ssh_dir {
     ensure_resource('file', $ssh_dir, {
-      'ensure'  => directory,
-      'owner'   => $ssh_dir_owner,
-      'group'   => $ssh_dir_group,
-      'mode'    => '0700',
-      'require' => File[$home_dir],
-      'before'  => Anchor["accounts::ssh_dir_created_${title}"],
+        'ensure'  => directory,
+        'owner'   => $ssh_dir_owner,
+        'group'   => $ssh_dir_group,
+        'mode'    => '0700',
+        'require' => File[$home_dir],
     })
+  }
+
+  $key_require = $manage_ssh_dir ? {
+    true  => File[$ssh_dir],
+    false => File[$home_dir],
   }
 
   # Error: Use of reserved word: type, must be quoted if intended to be a String value
@@ -60,8 +61,7 @@ define accounts::authorized_keys(
     user    => $username,
     'type'  => 'ssh-rsa', # intentional quotes! (Puppet 4 compatibility)
     target  => $auth_key_file,
-    before  => Anchor["accounts::auth_keys_created_${title}"],
-    require => Anchor["accounts::ssh_dir_created_${title}"],
+    require => $key_require,
   }
 
   if ($ssh_dir_owner != $title or $ssh_dir_group != $gid) {
@@ -85,6 +85,6 @@ define accounts::authorized_keys(
     owner   => $ssh_dir_owner,
     group   => $ssh_dir_group,
     mode    => '0600',
-    require => [Anchor["accounts::ssh_dir_created_${title}"], Anchor["accounts::auth_keys_created_${title}"]],
+    require => File[$home_dir],
   }
 }

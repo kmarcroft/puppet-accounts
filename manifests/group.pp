@@ -1,22 +1,17 @@
-# == Define accounts::group
+# @summary Manage a Linux/Unix group and optionally its members.
 #
-# A definition of a Linux/Unix group (and optionally its members).
-#
-# Always include main class definition:
-#
-#  class{ '::accounts': }
-#
-# or with pure YAML declaration, site.pp:
-#
-#  lookup('classes', {merge => unique}).include
-#
-# hiera configuration e.g. default.yaml:
-#   classes:
-#     - '::accounts'
-#   accounts::users:
-#     myuser:
-#       groups: ['users']
-#
+# @param groupname
+#   The group name. Defaults to the resource title.
+# @param ensure
+#   Whether the group should be present or absent.
+# @param members
+#   List of usernames to be members of the group.
+# @param auth_membership
+#   Whether to enforce that only listed members belong to the group.
+# @param gid
+#   Optional numeric GID to force for the group.
+# @param provider
+#   Group management provider. Defaults to 'gpasswd'.
 define accounts::group (
   String                             $groupname = $title,
   Enum['present', 'absent']          $ensure = 'present',
@@ -25,13 +20,12 @@ define accounts::group (
   Optional[Variant[String, Integer]] $gid = undef,
   String                             $provider = 'gpasswd',
 ) {
-
   # avoid problems when group declared elsewhere
   ensure_resource('group', $groupname, {
-    'ensure'          => $ensure,
-    'gid'             => $gid,
-    'members'         => sort(unique($members)),
-    'auth_membership' => $auth_membership,
-    'provider'        => $provider,
+      'ensure'          => $ensure,
+      'gid'             => $gid,
+      'members'         => sort(unique($members)),
+      'auth_membership' => $auth_membership,
+      'provider'        => $provider,
   })
 }

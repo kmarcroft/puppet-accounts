@@ -1,6 +1,6 @@
 # Accounts Module CHANGELOG
 
-## 3.0.0 (KriMax fork)
+## 3.0.0 (marckri fork)
 
 This is a maintained fork of [deric/puppet-accounts](https://github.com/deric/puppet-accounts).
 Many thanks to **Tomas Barton** (original author) and all previous contributors.

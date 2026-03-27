@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'puppet', ENV['PUPPET_VERSION'] || ['>= 7.0', '< 9.0']
+gem 'json_pure', '>= 2.7.0'
 
 group :test do
   gem 'rake'

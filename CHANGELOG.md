@@ -1,5 +1,37 @@
 # Accounts Module CHANGELOG
 
+## 3.1.0 - March 28th 2026
+
+### New features
+
+ * **`ssh_key_groups` parameter** — Define reusable collections of SSH keys at the
+   class level and assign them to users by group name:
+   ```yaml
+   accounts::ssh_key_groups:
+     devops:
+       deployer_key:
+         type: ssh-rsa
+         key: "AAAA..."
+   accounts::users:
+     john:
+       ssh_key_groups:
+         - devops
+   ```
+   Implemented from upstream PR #100.
+ * **`forcelocal` parameter** on `accounts::user` and `accounts::group` — Pass
+   through to native Puppet `user`/`group` resources for managing local accounts
+   when LDAP/AD is configured. Defaults to `false`. Implemented from upstream
+   PR #90.
+
+### Bug fixes
+
+ * **GID now correctly set on user resources** — Uncommented `gid => $real_gid` in
+   the User resource override so that `primary_group` is actually applied.
+   Fixes upstream issues #87 and #77. Implemented from upstream PR #93.
+ * **Quoted `$home_dir` in `rm -rf` exec** — The home-directory removal command
+   on user absent now properly quotes the path, preventing command breakage from
+   paths with spaces or special characters. Addresses upstream issue #84.
+
 ## 3.0.1 - March 28th 2026
 
 ### Cleanup & alignment

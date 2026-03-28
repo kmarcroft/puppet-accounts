@@ -16,7 +16,8 @@ full Hiera support.
 | `1.5.x`        | ✓          | ?            | ✗          | ✗                         |
 | `2.0.x`        | ✓          | ✓            | ✗          | ✗                         |
 | `2.1.x`        | ?          | ✓            | ✓ (partial)| ✗                         |
-| `3.0.x` (this) | ✗          | ✗            | ✓          | ✓                         |
+| `3.0.x`         | ✗          | ✗            | ✓          | ✓                         |
+| `3.1.x` (this) | ✗          | ✗            | ✓          | ✓                         |
 
 **Requires:** Puppet >= 7.0.0, puppetlabs-stdlib >= 8.0.0
 
@@ -126,6 +127,53 @@ accounts::users:
 The value may be a group name or a numeric GID.  Setting `gid` directly has the
 same effect; `manage_group` is ignored when `gid` is set.
 
+### SSH key groups
+
+Define reusable collections of SSH keys and assign them to users by group name.
+This avoids duplicating the same key across many users in Hiera.
+
+```yaml
+accounts::ssh_key_groups:
+  devops:
+    deployer_key:
+      type: ssh-rsa
+      key: "AAAA..."
+    ci_key:
+      type: ssh-ed25519
+      key: "AAAA..."
+  monitoring:
+    nagios_key:
+      type: ssh-rsa
+      key: "AAAA..."
+
+accounts::users:
+  john:
+    ssh_key_groups:
+      - devops
+      - monitoring
+    ssh_keys:
+      'johns_personal_key':
+        type: ssh-rsa
+        key: "AAAA..."
+```
+
+Keys from all listed groups are merged with the user's individual `ssh_keys`.
+
+### Force local accounts
+
+When LDAP or Active Directory is configured, Puppet may try to manage remote
+accounts.  Set `forcelocal: true` to force management of local accounts only:
+
+```yaml
+accounts::users:
+  john:
+    forcelocal: true
+
+accounts::groups:
+  mygroup:
+    forcelocal: true
+```
+
 ### Account removal
 
 ```yaml
@@ -205,8 +253,10 @@ same salt.
 | `password`              | —                         | Cleartext password (mutually exclusive with `pwhash`) |
 | `salt`                  | random / fact-based       | Salt for hashing (max 16 chars: `[A-Za-z0-9./]`) |
 | `hash`                  | `'SHA-512'`               | Hash function for `password` (see stdlib `pw_hash`) |
+| `forcelocal`            | `false`                   | Force management of local accounts (LDAP/AD) |
 | `force_removal`         | `true`                    | Kill user processes before account removal |
 | `hushlogin`             | `false`                   | Create `.hushlogin` to suppress MOTD |
+| `ssh_key_groups`        | `[]`                      | List of SSH key group names to assign |
 | `ssh_dir_owner`         | username                  | Owner of `.ssh/` directory |
 | `ssh_dir_group`         | username                  | Group of `.ssh/` directory |
 | `manage_ssh_dir`        | `true`                    | Whether to manage `.ssh/` directory |

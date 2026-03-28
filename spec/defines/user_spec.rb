@@ -179,7 +179,7 @@ describe 'accounts::user', :type => :define do
       )
     }
 
-    it { is_expected.not_to contain_exec('rm -rf /home/mickey')}
+    it { is_expected.not_to contain_exec("rm -rf '/home/mickey'")}
     it { is_expected.to contain_exec('killproc mickey')}
 
     it {
@@ -208,7 +208,7 @@ describe 'accounts::user', :type => :define do
       )
     }
 
-    it { is_expected.to contain_exec('rm -rf /home/trudy')}
+    it { is_expected.to contain_exec("rm -rf '/home/trudy'")}
     it { is_expected.to contain_exec('killproc trudy')}
 
     it {

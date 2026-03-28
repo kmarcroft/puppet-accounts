@@ -16,6 +16,9 @@
 #   When true, class parameters are augmented from Hiera. Set false in tests.
 # @param home_permissions
 #   Default file mode for user home directories. Resolved from module Hiera data.
+# @param ssh_key_groups
+#   Hash of named SSH key groups. Each group maps a name to a hash of SSH keys.
+#   Users reference groups via their ssh_key_groups parameter to avoid key duplication.
 class accounts (
   Boolean $manage_users     = true,
   Boolean $manage_groups    = true,
@@ -23,6 +26,7 @@ class accounts (
   Hash    $groups           = {},
   Hash    $user_defaults    = {},
   Hash    $options          = {},
+  Hash    $ssh_key_groups   = {},
   Boolean $use_lookup       = true,
   String  $home_permissions = '0700',
 ) {

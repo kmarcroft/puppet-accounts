@@ -58,7 +58,7 @@ class accounts (
   if $manage_groups {
     $_groups = merge($groups, $groups_h)
 
-    if has_key($user_defaults, 'groups') {
+    if 'groups' in $user_defaults {
       $default_groups = $user_defaults['groups']
     } else {
       $default_groups = []

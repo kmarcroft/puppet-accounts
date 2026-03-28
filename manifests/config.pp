@@ -5,7 +5,7 @@
 class accounts::config (
   Hash $options = {}
 ) {
-  if has_key($options, 'umask') {
+  if 'umask' in $options {
     $umask = $options['umask']
     augeas { 'Set umask':
       incl    => '/etc/login.defs',
@@ -16,7 +16,7 @@ class accounts::config (
     }
   }
 
-  if has_key($options, 'first_uid') {
+  if 'first_uid' in $options {
     case $facts['os']['family'] {
       'Debian': {
         shellvar { 'FIRST_UID':
@@ -40,7 +40,7 @@ class accounts::config (
     }
   }
 
-  if has_key($options, 'last_uid') {
+  if 'last_uid' in $options {
     case $facts['os']['family'] {
       'Debian': {
         shellvar { 'LAST_UID':
@@ -64,7 +64,7 @@ class accounts::config (
     }
   }
 
-  if has_key($options, 'first_gid') {
+  if 'first_gid' in $options {
     case $facts['os']['family'] {
       'Debian': {
         shellvar { 'FIRST_GID':
@@ -88,7 +88,7 @@ class accounts::config (
     }
   }
 
-  if has_key($options, 'last_gid') {
+  if 'last_gid' in $options {
     case $facts['os']['family'] {
       'Debian': {
         shellvar { 'LAST_GID':

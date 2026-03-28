@@ -18,6 +18,9 @@
 #   Path to a file to use as the authorized_keys source (overrides ssh_keys).
 # @param ssh_keys
 #   Hash of SSH public keys to add to the user's authorized_keys file.
+# @param ssh_key_groups
+#   Array of SSH key group names (defined in accounts::ssh_key_groups) whose keys
+#   are merged into this user's authorized_keys. Individual ssh_keys take precedence.
 # @param purge_ssh_keys
 #   When true, remove any SSH keys not explicitly listed in ssh_keys.
 # @param shell
@@ -82,6 +85,7 @@ define accounts::user (
   Array                              $groups                 = [],
   Optional[Stdlib::Absolutepath]     $ssh_key_source         = undef,
   Hash                               $ssh_keys               = {},
+  Array                              $ssh_key_groups         = [],
   Boolean                            $purge_ssh_keys         = false,
   String                             $shell                  = '/bin/bash',
   Optional[String]                  $pwhash                 = undef,
@@ -164,10 +168,7 @@ define accounts::user (
   }
 
   User<| title == $username |> {
-    # Actuall primary group assignment is done later
-    # intentionally omitting primary group in order to avoid dependency cycles
-    # see https://github.com/deric/puppet-accounts/issues/39
-    #gid       => $real_gid,
+    gid        => $real_gid,
     comment    => $comment,
     managehome => $managehome,
     home       => $home_dir,
@@ -281,8 +282,17 @@ define accounts::user (
           }
         }
 
+        # Resolve SSH key groups into a merged hash of keys
+        $mapped_ssh_keys = $ssh_key_groups.reduce({}) |$memo, $key_group| {
+          if ($key_group in $accounts::ssh_key_groups) {
+            $memo + $accounts::ssh_key_groups[$key_group]
+          } else {
+            fail("accounts::user ${username}: ssh_key_group '${key_group}' does not exist!")
+          }
+        }
+
         accounts::authorized_keys { $username:
-          ssh_keys             => $ssh_keys,
+          ssh_keys             => $mapped_ssh_keys + $ssh_keys,
           ssh_key_source       => $ssh_key_source,
           authorized_keys_file => $authorized_keys_file,
           home_dir             => $home_dir,

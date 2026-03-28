@@ -38,6 +38,7 @@ EOS
     args[0].each do |user, val|
       # don't assign users marked for removal to groups
       next if val.key? 'ensure' and val['ensure'] == 'absent'
+
       val['primary_group'] = user.to_s unless val.key? 'primary_group'
       val['manage_group'] = true unless val.key? 'manage_group'
       if val['manage_group']

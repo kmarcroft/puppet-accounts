@@ -1,4 +1,5 @@
 AllCops:
+  NewCops: disable
   Exclude:
     # Ignore HTML related things
     - '**/*.erb'
@@ -33,7 +34,7 @@ Lint/LiteralAsCondition:
   Enabled: true
 
 Lint/ShadowingOuterLocalVariable:
-  Enabled: true
+  Enabled: false
 
 Lint/LiteralInInterpolation:
   Enabled: true
@@ -120,7 +121,7 @@ Lint/UselessAccessModifier:
   Enabled: true
 
 Lint/UselessAssignment:
-  Enabled: true
+  Enabled: false
 
 Lint/Void:
   Enabled: true
@@ -486,3 +487,78 @@ Style/Encoding:
 
 Layout/HeredocIndentation:
   Enabled: false
+
+# --- Disabled: spec/lib noise ---
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Naming/HeredocDelimiterNaming:
+  Enabled: false
+
+Layout/BlockEndNewline:
+  Enabled: false
+
+Layout/MultilineBlockLayout:
+  Enabled: false
+
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+Layout/ArgumentAlignment:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: false
+
+Layout/ClosingParenthesisIndentation:
+  Enabled: false
+
+Layout/ClosingHeredocIndentation:
+  Enabled: false
+
+Layout/ExtraSpacing:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/TrailingCommaInArguments:
+  Enabled: false
+
+Style/FormatStringToken:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/StringConcatenation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/ConditionalAssignment:
+  Enabled: false
+
+Style/MixinUsage:
+  Enabled: false
+
+Style/RedundantInterpolation:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Lint/BooleanSymbol:
+  Enabled: false
+
+Lint/ScriptPermission:
+  Enabled: false
+

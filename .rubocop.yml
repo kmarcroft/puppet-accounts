@@ -29,7 +29,7 @@ Lint/EnsureReturn:
 Lint/SuppressedException:
   Enabled: true
 
-Lint/LiteralInCondition:
+Lint/LiteralAsCondition:
   Enabled: true
 
 Lint/ShadowingOuterLocalVariable:
@@ -134,13 +134,13 @@ Naming/AccessorMethodName:
 Style/Alias:
   Enabled: false
 
-Style/AlignArray:
+Layout/ArrayAlignment:
   Enabled: false
 
-Style/AlignHash:
+Layout/HashAlignment:
   Enabled: false
 
-Style/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: false
 
 Metrics/BlockNesting:
@@ -193,19 +193,19 @@ Style/WordArray:
 Style/RedundantPercentQ:
   Enabled: false
 
-Style/Tab:
+Layout/IndentationStyle:
   Enabled: false
 
 Layout/SpaceBeforeSemicolon:
   Enabled: false
 
-Style/TrailingBlankLines:
+Layout/TrailingEmptyLines:
   Enabled: false
 
 Layout/SpaceInsideBlockBraces:
   Enabled: false
 
-Style/SpaceInsideBrackets:
+Layout/SpaceInsideArrayLiteralBrackets:
   Enabled: false
 
 Layout/SpaceInsideHashLiteralBraces:
@@ -287,10 +287,10 @@ Style/EachWithObject:
 Layout/EmptyLineBetweenDefs:
   Enabled: false
 
-Style/IndentArray:
+Layout/FirstArrayElementIndentation:
   Enabled: false
 
-Style/IndentHash:
+Layout/FirstHashElementIndentation:
   Enabled: false
 
 Layout/IndentationConsistency:
@@ -484,5 +484,5 @@ Style/IfWithSemicolon:
 Style/Encoding:
   Enabled: false
 
-Style/IndentHeredoc:
+Layout/HeredocIndentation:
   Enabled: false

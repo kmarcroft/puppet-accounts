@@ -11,11 +11,6 @@ RSpec.configure do |c|
   c.mock_with :rspec
   c.hiera_config = 'spec/fixtures/hiera/hiera.yaml'
   c.module_path  = File.join(fixture_path, 'modules')
-
-  c.before(:each) do
-    # Stub assert_private from stdlib so it does not fail inside tests
-    Puppet::Parser::Functions.newfunction(:assert_private) { |_args| }
-  end
 end
 
 at_exit { RSpec::Puppet::Coverage.report! }

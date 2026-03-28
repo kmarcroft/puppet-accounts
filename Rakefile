@@ -33,11 +33,6 @@ end
 
 PuppetSyntax.exclude_paths = exclude_paths
 
-desc 'Run acceptance tests'
-RSpec::Core::RakeTask.new(:acceptance) do |t|
-  t.pattern = 'spec/acceptance/*_spec.rb'
-end
-
 desc 'Populate CONTRIBUTORS file'
 task :contributors do
   system("git log --format='%aN' | sort -u > CONTRIBUTORS")

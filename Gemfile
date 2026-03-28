@@ -30,5 +30,4 @@ end
 
 group :system_tests do
   gem 'puppet_litmus', '>= 1.0'
-  gem 'serverspec', '>= 2.0'
 end

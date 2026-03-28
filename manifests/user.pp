@@ -66,6 +66,8 @@
 #   File mode for the home directory.
 # @param manage_ssh_dir
 #   Whether to manage the .ssh directory inside the home directory.
+# @param forcelocal
+#   When true, forces management of local accounts even when LDAP/AD is configured.
 # @param ssh_dir_owner
 #   Owner of the .ssh directory and authorized_keys file.
 # @param ssh_dir_group
@@ -108,6 +110,7 @@ define accounts::user (
   Boolean                            $allowdupe              = false,
   String                             $home_permissions       = '0700',
   Boolean                            $manage_ssh_dir         = true,
+  Boolean                            $forcelocal             = false,
   Optional[Variant[String, Integer]] $ssh_dir_owner          = undef,
   Optional[Variant[String, Integer]] $ssh_dir_group          = undef,
 ) {
@@ -217,6 +220,7 @@ define accounts::user (
         uid              => $uid,
         shell            => $shell,
         allowdupe        => $allowdupe,
+        forcelocal       => $forcelocal,
         purge_ssh_keys   => $purge_ssh_keys,
         password_max_age => $password_max_age,
       }

@@ -15,6 +15,7 @@ EOS
     if args[0].class != Hash or args[1].class != Hash
       raise(Puppet::ParseError, "accounts_group_members(): first two arguments must be a Hash, you passed a " + args[0].class.to_s + " and "+ args[1].class.to_s)
     end
+
     if args.size == 3 and args[2].class != Array
       raise(Puppet::ParseError, "accounts_group_members(): last argument must be an Array, you passed a " + args[2].class.to_s)
     end

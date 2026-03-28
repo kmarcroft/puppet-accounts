@@ -35,7 +35,7 @@ Puppet::Type.type(:group).provide :gpasswd, :parent => Puppet::Type::Group::Prov
 
     # We're returning /bin/true here since the Nameservice classes
     # would execute whatever is returned here.
-    return '/bin/true'
+    '/bin/true'
   end
 
   # This is a repeat from puppet/provider/nameservice/objectadd.
@@ -75,9 +75,9 @@ Puppet::Type.type(:group).provide :gpasswd, :parent => Puppet::Type::Group::Prov
 
     # Puppet 5.5.7 breaking change workaround
     if is_new_format?
-      return retval.join(',')
+      retval.join(',')
     else
-      return retval
+      retval
     end
   end
 

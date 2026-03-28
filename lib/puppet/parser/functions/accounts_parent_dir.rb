@@ -11,6 +11,6 @@ EOS
     end
 
     idx = args[0].rindex('/')
-    return args[0][0...idx]
+    args[0][0...idx]
   end
 end

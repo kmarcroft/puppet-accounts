@@ -7,7 +7,6 @@
   "source": "https://github.com/kmarcroft/puppet-accounts",
   "project_page": "https://github.com/kmarcroft/puppet-accounts",
   "issues_url": "https://github.com/kmarcroft/puppet-accounts/issues",
-  "description": "User and groups management with Hiera support. Forked from deric/puppet-accounts.",
   "dependencies": [
     {
       "name": "puppetlabs-stdlib",

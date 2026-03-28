@@ -4,9 +4,9 @@
   "author": "Kristian Marcroft",
   "summary": "Module for managing user accounts, groups, and SSH keys.",
   "license": "Apache-2.0",
-  "source": "https://github.com/marckri/puppet-accounts",
-  "project_page": "https://github.com/marckri/puppet-accounts",
-  "issues_url": "https://github.com/marckri/puppet-accounts/issues",
+  "source": "https://github.com/kmarcroft/puppet-accounts",
+  "project_page": "https://github.com/kmarcroft/puppet-accounts",
+  "issues_url": "https://github.com/kmarcroft/puppet-accounts/issues",
   "description": "User and groups management with Hiera support. Forked from deric/puppet-accounts.",
   "dependencies": [
     {

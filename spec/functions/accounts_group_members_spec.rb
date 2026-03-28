@@ -11,15 +11,15 @@ describe 'accounts_group_members' do
     end
 
     it 'should raise an error with incorrect type of arguments' do
-      is_expected.to run.with_params(1, 2).and_raise_error(Puppet::Error)
+      is_expected.to run.with_params(1, 2).and_raise_error(ArgumentError)
     end
 
     it 'should raise an error when running without arguments' do
-      is_expected.to run.with_params(nil).and_raise_error(Puppet::Error)
+      is_expected.to run.with_params(nil).and_raise_error(ArgumentError)
     end
 
     it 'should raise an error when given incorrect type' do
-      is_expected.to run.with_params([]).and_raise_error(Puppet::Error)
+      is_expected.to run.with_params([]).and_raise_error(ArgumentError)
     end
   end
 

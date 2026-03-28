@@ -599,14 +599,6 @@ describe 'accounts::user', :type => :define do
       it { is_expected.to compile.and_raise_error(/You cannot set both \$pwhash and \$password/) }
     end
 
-    # we need to provide different hashes, as the fqdn_rand implementation differs
-    # between puppet versions...
-    hash = ''
-    hash = if Gem::Version.new(Puppet.version) < Gem::Version.new("4.4.0")
-      '$6$g9aYujG8oLQDJWBO$dNhF1lBTXpiG86V5Ra8nbzZIVmIioD293jZMHpA7bPHd34iIGPddfPWbjcX0bFVXRKA38LE1Z4K/Gqb4WNaxe/'
-           else
-      '$6$qcmrAVy2N6yFHaD7$zAJCY8zAhLgeTe2bJ1Ui6pPXKTkJ..Qbx56tYhrVbZEbUiRG/hKLliAzvTQm3GlIds6DGncYFEJAd4w0HYxgV.'
-           end
     describe 'without salt and empty fact' do
       let(:params) do
         {
@@ -624,10 +616,13 @@ describe 'accounts::user', :type => :define do
           },
         }
       end
+      # Salt is derived from fqdn_rand_string which uses the Puppet certname
+      # (not the fqdn fact), so the exact hash is host-specific. Just verify
+      # it is a valid SHA-512 crypt hash.
       it {
         is_expected.to contain_user('foo').with(
           'name'     => 'foo',
-          'password' => hash
+          'password' => match(/\A\$6\$/)
         )
       }
     end

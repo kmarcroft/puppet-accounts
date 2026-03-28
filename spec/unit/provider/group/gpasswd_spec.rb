@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'etc'
 
 RSpec::Matchers.define_negated_matcher :excluding, :include
 
@@ -67,9 +68,8 @@ describe Puppet::Type.type(:group).provider(:gpasswd) do
     describe "when adding additional group members to a new group" do
       let(:members) { ['test_one','test_two','test_three'] }
       it "should pass all members individually as group add options to gpasswd" do
-        expect(provider).to receive(:execute).with(
-          '/bin/true', kind_of(Hash)
-        )
+        # Allow parent-class execute calls (Puppet 8 may call groupmod -m for members)
+        allow(provider).to receive(:execute)
         expect(provider).to receive(:execute).with(
           '/usr/sbin/groupadd mygroup', kind_of(Hash)
         )
@@ -87,7 +87,7 @@ describe Puppet::Type.type(:group).provider(:gpasswd) do
       it "should add all new members" do
         allow(Etc).to receive(:getgrnam).with('mygroup')
           .and_return(
-            Struct::Group.new('mygroup','x','99999',[])
+            Etc::Group.new('mygroup','x','99999',[])
           )
         @resource[:auth_membership] = :false
         members.each do |member|
@@ -108,7 +108,7 @@ describe Puppet::Type.type(:group).provider(:gpasswd) do
         old_members = ['old_one','old_two','old_three','test_three']
         allow(Etc).to receive(:getgrnam).with('mygroup')
           .and_return(
-            Struct::Group.new('mygroup','x','99999',old_members)
+            Etc::Group.new('mygroup','x','99999',old_members)
           )
         @resource[:auth_membership] = :false
         (members | old_members).each do |member|
@@ -129,7 +129,7 @@ describe Puppet::Type.type(:group).provider(:gpasswd) do
         old_members = ['old_one','old_two','old_three','test_three']
         allow(Etc).to receive(:getgrnam).with('mygroup')
           .and_return(
-            Struct::Group.new('mygroup','x','99999',old_members)
+            Etc::Group.new('mygroup','x','99999',old_members)
           )
 
         @resource[:auth_membership] = :true

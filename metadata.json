@@ -42,6 +42,14 @@
       ]
     },
     {
+      "operatingsystem": "OracleLinux",
+      "operatingsystemrelease": [
+        "8",
+        "9",
+        "10"
+      ]
+    },
+    {
       "operatingsystem": "Rocky",
       "operatingsystemrelease": [
         "8",
@@ -80,5 +88,15 @@
       "name": "puppet",
       "version_requirement": ">= 7.0.0 < 9.0.0"
     }
-  ]
+  ],
+  "tags": [
+    "accounts",
+    "users",
+    "groups",
+    "ssh",
+    "hiera"
+  ],
+  "pdk-version": "3.6.1",
+  "template-url": "pdk-default#3.6.1",
+  "template-ref": "tags/3.6.1-0-gb9426e5"
 }

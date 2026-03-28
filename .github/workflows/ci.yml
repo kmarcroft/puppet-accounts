@@ -41,7 +41,7 @@ jobs:
           - ruby: '3.2'
             puppet: '~> 8.0'
     env:
-      PUPPET_VERSION: ${{ matrix.puppet }}
+      PUPPET_GEM_VERSION: ${{ matrix.puppet }}
     steps:
       - uses: actions/checkout@v5
       - uses: ruby/setup-ruby@v1

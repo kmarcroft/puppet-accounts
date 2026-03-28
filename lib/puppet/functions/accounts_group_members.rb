@@ -32,11 +32,12 @@ Puppet::Functions.create_function(:accounts_group_members) do
       end
     end
 
-    res = groups.clone
+    res = groups.dup
     users.each do |user, val|
       # Don't assign users marked for removal to groups.
       next if val.key?('ensure') && val['ensure'] == 'absent'
 
+      val = val.dup
       val['primary_group'] = user.to_s unless val.key?('primary_group')
       val['manage_group']  = true       unless val.key?('manage_group')
 

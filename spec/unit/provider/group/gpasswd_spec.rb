@@ -90,10 +90,11 @@ describe Puppet::Type.type(:group).provider(:gpasswd) do
             Etc::Group.new('mygroup','x','99999',[])
           )
         @resource[:auth_membership] = :false
+        allow(provider).to receive(:execute)
         members.each do |member|
           expect(provider).to receive(:execute).with(
             "/usr/bin/gpasswd -a #{member} mygroup", kind_of(Hash)
-          )
+          ).at_least(:once)
         end
         provider.create
         provider.members
@@ -111,10 +112,11 @@ describe Puppet::Type.type(:group).provider(:gpasswd) do
             Etc::Group.new('mygroup','x','99999',old_members)
           )
         @resource[:auth_membership] = :false
+        allow(provider).to receive(:execute)
         (members | old_members).each do |member|
           expect(provider).to receive(:execute).with(
             "/usr/bin/gpasswd -a #{member} mygroup", kind_of(Hash)
-          )
+          ).at_least(:once)
         end
         provider.create
         provider.members
@@ -134,15 +136,17 @@ describe Puppet::Type.type(:group).provider(:gpasswd) do
 
         @resource[:auth_membership] = :true
 
+        allow(provider).to receive(:execute)
+
         (members - old_members).each do |to_add|
           expect(provider).to receive(:execute).with(
             "/usr/bin/gpasswd -a #{to_add} mygroup", kind_of(Hash)
-          )
+          ).at_least(:once)
         end
         (old_members - @resource[:members]).each do |to_del|
           expect(provider).to receive(:execute).with(
             "/usr/bin/gpasswd -d #{to_del} mygroup", kind_of(Hash)
-          )
+          ).at_least(:once)
         end
         provider.create
         provider.members

@@ -620,10 +620,9 @@ describe 'accounts::user', :type => :define do
       # (not the fqdn fact), so the exact hash is host-specific. Just verify
       # it is a valid SHA-512 crypt hash.
       it {
-        is_expected.to contain_user('foo').with(
-          'name'     => 'foo',
-          'password' => match(/\A\$6\$/)
-        )
+        is_expected.to contain_user('foo').with('name' => 'foo')
+        pwd = catalogue.resource('user', 'foo')[:password]
+        expect(pwd).to match(/\A\$6\$/)
       }
     end
     describe 'without salt and with fact' do

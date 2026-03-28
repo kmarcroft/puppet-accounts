@@ -180,9 +180,9 @@ define accounts::user (
   case $ensure {
     'absent': {
       if $managehome == true and $destroy_home_on_remove == true {
-        exec { "rm -rf ${home_dir}":
+        exec { "rm -rf '${home_dir}'":
           path   => ['/bin', '/usr/bin'],
-          onlyif => "test -d ${home_dir}",
+          onlyif => "test -d '${home_dir}'",
         }
       }
 

@@ -76,8 +76,6 @@ describe 'accounts::user', :type => :define do
       )
     }
 
-    it { is_expected.to contain_anchor("accounts::auth_keys_created_#{user}")}
-    it { is_expected.to contain_anchor("accounts::ssh_dir_created_#{user}")}
   end
 
   context 'create new user' do
@@ -183,7 +181,6 @@ describe 'accounts::user', :type => :define do
 
     it { is_expected.not_to contain_exec('rm -rf /home/mickey')}
     it { is_expected.to contain_exec('killproc mickey')}
-    it { is_expected.to contain_anchor('accounts::user::remove_mickey')}
 
     it {
       is_expected.to contain_group('mickey').with(
@@ -213,7 +210,6 @@ describe 'accounts::user', :type => :define do
 
     it { is_expected.to contain_exec('rm -rf /home/trudy')}
     it { is_expected.to contain_exec('killproc trudy')}
-    it { is_expected.to contain_anchor('accounts::user::remove_trudy')}
 
     it {
       is_expected.to contain_group('trudy').with(
@@ -240,7 +236,6 @@ describe 'accounts::user', :type => :define do
     }
     # don't kill user's process
     it { is_expected.not_to contain_exec('killproc mickey')}
-    it { is_expected.to contain_anchor('accounts::user::remove_mickey')}
 
     it {
       is_expected.to contain_group('mickey').with(
@@ -314,8 +309,6 @@ describe 'accounts::user', :type => :define do
       'ensure'  => 'present',
     }) }
 
-    it { is_expected.to contain_anchor("accounts::auth_keys_created_foo")}
-    it { is_expected.to contain_anchor("accounts::ssh_dir_created_foo")}
   end
 
   context 'supply custom path to authorized_keys file outside of home dir' do

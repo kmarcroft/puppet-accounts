@@ -1,6 +1,6 @@
 {
   "name": "marckri-accounts",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": "Kristian Marcroft",
   "summary": "Module for managing user accounts, groups, and SSH keys.",
   "license": "Apache-2.0",

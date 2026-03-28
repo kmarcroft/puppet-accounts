@@ -26,6 +26,7 @@ full Hiera support.
 | ------------------------- | ----------- |
 | Red Hat Enterprise Linux  | 7, 8, 9, 10 |
 | CentOS                    | 7, 8, 9, 10 |
+| Oracle Linux              | 8, 9, 10    |
 | Rocky Linux               | 8, 9, 10    |
 | AlmaLinux                 | 8, 9, 10    |
 | Debian                    | 10, 11, 12, 13 |
@@ -256,7 +257,7 @@ Defaults to `puppet:///modules/accounts/{username}`.
 
 ## Hiera configuration
 
-Puppet 4.9+ (Hiera 5) example `hiera.yaml`:
+Hiera 5 example `hiera.yaml`:
 
 ```yaml
 ---
@@ -308,36 +309,27 @@ class { 'accounts':
 
 ## Testing
 
-Install dependencies and run unit tests:
+### Run validation and unit tests
+
+```bash
+pdk validate
+pdk test unit
+```
+
+Or with Bundler directly:
 
 ```bash
 bundle install
+bundle exec rake lint
 bundle exec rake spec
 ```
 
-Run lint and syntax checks:
+### CI
 
-```bash
-bundle exec rake lint
-bundle exec rake syntax
-```
-
-Run all checks at once (default task):
-
-```bash
-bundle exec rake
-```
-
-### Acceptance / system tests
-
-Acceptance tests use [Puppet Litmus](https://github.com/puppetlabs/puppet_litmus):
-
-```bash
-bundle exec rake 'litmus:provision[docker, debian:12]'
-bundle exec rake litmus:install_agent
-bundle exec rake litmus:install_module
-bundle exec rake litmus:acceptance:parallel
-```
+This module uses [GitHub Actions](.github/workflows/ci.yml) for automated
+metadata validation, syntax checking, puppet-lint, rubocop, and unit tests.
+On version tags (`v*`), a module package is built and published as a GitHub
+Release.
 
 ## Attribution
 

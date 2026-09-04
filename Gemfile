@@ -18,7 +18,7 @@ group :test do
   gem 'rubocop', '>= 1.50'
   gem 'rubocop-performance'
   gem 'puppet-lint', '>= 3.0'
-  gem 'puppet-syntax', '>= 3.2'
+  gem 'puppetlabs-syntax', '>= 7.2'
   gem 'voxpupuli-test', '>= 7.0'
 end
 

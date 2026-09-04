@@ -5,7 +5,6 @@ require 'bundler/setup'
 
 require 'puppetlabs_spec_helper/rake_tasks'
 require 'puppet-lint/tasks/puppet-lint'
-require 'puppet-syntax/tasks/puppet-syntax'
 require 'metadata-json-lint/rake_task'
 
 begin
@@ -31,7 +30,7 @@ PuppetLint::RakeTask.new :lint do |config|
   config.log_format = '%{path}:%{line}:%{KIND}: %{message}'
 end
 
-PuppetSyntax.exclude_paths = exclude_paths
+PuppetlabsSyntax.exclude_paths = exclude_paths
 
 desc 'Populate CONTRIBUTORS file'
 task :contributors do

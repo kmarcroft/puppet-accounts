@@ -1,5 +1,28 @@
 # Accounts Module CHANGELOG
 
+## 3.1.1 - September 5th 2026
+
+### Bug fixes
+
+ * **Fixed `groupmod: invalid option -- 'm'` on group membership changes** — The
+   `gpasswd` group provider's `create` action no longer falls through to the
+   parent `groupadd` provider's `members=` handling, which invoked
+   `groupmod -m` and failed on distributions (e.g. Ubuntu/Debian shadow-utils)
+   whose `groupmod` has no member-modifying flag. Members are now added via
+   `gpasswd` exclusively, as intended.
+
+### Cleanup & alignment
+
+ * **Fixed duplicate `syntax:manifests` task registration** — The Rakefile no
+   longer requires the legacy `puppet-syntax` rake tasks in addition to the
+   `puppetlabs-syntax` tasks pulled in by `puppetlabs_spec_helper`. Running the
+   same check twice in one process was causing spurious
+   `Attempt to redefine entity` errors for defined types during
+   `rake syntax`. The `Gemfile` now depends on `puppetlabs-syntax` instead of
+   `puppet-syntax`.
+ * **Fixed `puppet-lint` `strict_indent` warnings** in `accounts::authorized_keys`,
+   `accounts::group`, and `accounts`, which were failing `rake lint` in CI.
+
 ## 3.1.0 - March 28th 2026
 
 ### New features

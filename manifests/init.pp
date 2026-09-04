@@ -53,8 +53,8 @@ class accounts (
 
   if $manage_users {
     $udef = merge($user_defaults, $user_defaults_h, {
-        home_permissions => $home_permissions,
-        require          => Class['accounts::config'],
+      home_permissions => $home_permissions,
+      require          => Class['accounts::config'],
     })
     create_resources(accounts::user, $_users, $udef)
   }

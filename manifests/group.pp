@@ -25,11 +25,11 @@ define accounts::group (
 ) {
   # avoid problems when group declared elsewhere
   ensure_resource('group', $groupname, {
-      'ensure'          => $ensure,
-      'gid'             => $gid,
-      'members'         => sort(unique($members)),
-      'auth_membership' => $auth_membership,
-      'forcelocal'      => $forcelocal,
-      'provider'        => $provider,
+    'ensure'          => $ensure,
+    'gid'             => $gid,
+    'members'         => sort(unique($members)),
+    'auth_membership' => $auth_membership,
+    'forcelocal'      => $forcelocal,
+    'provider'        => $provider,
   })
 }

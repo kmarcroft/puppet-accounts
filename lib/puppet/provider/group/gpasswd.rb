@@ -20,6 +20,16 @@ Puppet::Type.type(:group).provide :gpasswd, :parent => Puppet::Type::Group::Prov
       @resource.parameter('members').class.ancestors.include?(Puppet::Property::List)
   end
 
+  # Puppet::Type::Group::ProviderGroupadd#create (our parent class) calls
+  # `set(:members, ...)` after creating the group, which runs modifycmd
+  # and invokes `groupmod` to set members. Most groupmod implementations
+  # (e.g. Ubuntu's shadow-utils) have no member-modifying flag, so this
+  # fails. Members are already added via gpasswd in addcmd, so skip
+  # ProviderGroupadd's behavior and call NameService#create directly.
+  def create
+    Puppet::Provider::NameService.instance_method(:create).bind(self).call
+  end
+
   def addcmd
     # This pulls in the main group add command should the group need
     # to be added from scratch.

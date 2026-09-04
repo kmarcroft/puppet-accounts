@@ -68,8 +68,6 @@ describe Puppet::Type.type(:group).provider(:gpasswd) do
     describe "when adding additional group members to a new group" do
       let(:members) { ['test_one','test_two','test_three'] }
       it "should pass all members individually as group add options to gpasswd" do
-        # Allow parent-class execute calls (Puppet 8 may call groupmod -m for members)
-        allow(provider).to receive(:execute)
         expect(provider).to receive(:execute).with(
           '/usr/sbin/groupadd mygroup', kind_of(Hash)
         )
@@ -78,6 +76,9 @@ describe Puppet::Type.type(:group).provider(:gpasswd) do
             "/usr/bin/gpasswd -a #{member} mygroup", kind_of(Hash)
           )
         end
+        # ProviderGroupadd#create would additionally call groupmod -m,
+        # which is unsupported on most systems; ensure it's never invoked.
+        expect(provider).not_to receive(:execute).with(/groupmod -m/, anything)
         provider.create
       end
     end

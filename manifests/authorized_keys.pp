@@ -42,11 +42,11 @@ define accounts::authorized_keys (
 
   if $manage_ssh_dir {
     ensure_resource('file', $ssh_dir, {
-        'ensure'  => directory,
-        'owner'   => $ssh_dir_owner,
-        'group'   => $ssh_dir_group,
-        'mode'    => '0700',
-        'require' => File[$home_dir],
+      'ensure'  => directory,
+      'owner'   => $ssh_dir_owner,
+      'group'   => $ssh_dir_group,
+      'mode'    => '0700',
+      'require' => File[$home_dir],
     })
   }
 
